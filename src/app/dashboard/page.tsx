@@ -1,6 +1,6 @@
-import { createClient } from "@/lib/supabase/server";
-import Link from "next/link";
-
+import { createClient } from '@/lib/supabase/server';
+import Link from 'next/link';
+import { Button } from '@/components/ui';
 export default async function DashboardPage() {
   const supabase = await createClient();
   const {
@@ -12,7 +12,7 @@ export default async function DashboardPage() {
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold">Dashboard</h1>
         <p className="text-neutral-400">
-          Please{" "}
+          Please{' '}
           <a href="/login" className="underline">
             sign in
           </a>
@@ -33,9 +33,7 @@ export default async function DashboardPage() {
           New entry
         </Link>
         <form action="/signout" method="post">
-          <button className="rounded bg-neutral-800 px-3 py-1 hover:bg-neutral-700">
-            Sign out
-          </button>
+          <Button>Sign out</Button>
         </form>
       </div>
     </div>
