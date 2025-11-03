@@ -125,6 +125,14 @@ export default async function DashboardPage({
                 : ''}
               {e.rating ? ` · ★${e.rating}` : ''}
             </div>
+            <div>
+              <Link
+                href={`/entries/${e.id}/edit`}
+                className="text-emerald-400 underline underline-offset-4 hover:text-emerald-300"
+              >
+                Edit
+              </Link>
+            </div>
           </li>
         ))}
       </ul>
