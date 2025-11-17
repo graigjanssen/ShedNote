@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import DeleteConfirmButton from './DeleteConfirmButton';
+import EntryForm from '@/components/EntryForm';
+import DeleteEntryButton from '@/components/DeleteEntryButton';
 import { Button, Input, Label, Textarea } from '@/components/ui';
 import { updateEntry, deleteEntry } from './actions';
 
@@ -49,14 +50,15 @@ export default async function EditEntryPage({
 
   if (error || !entry) notFound();
 
-  // Normalize defaults for inputs
-  const playedOn = entry.played_on ?? new Date().toISOString().slice(0, 10);
-  const duration = entry.duration_min ?? 0;
-  const piece = entry.piece ?? '';
-  const bpm = entry.bpm ?? '';
-  const tagsComma = (entry.tags ?? []).join(', ');
-  const rating = entry.rating ?? 3;
-  const notes = entry.notes ?? '';
+  const defaults = {
+    played_on: (entry.played_on ?? '').slice(0, 10),
+    duration_min: String(entry.duration_min ?? ''),
+    piece: entry.piece ?? '',
+    bpm: entry.bpm == null ? '' : String(entry.bpm),
+    tags: Array.isArray(entry.tags) ? entry.tags.join(', ') : '',
+    rating: entry.rating == null ? '3' : String(entry.rating),
+    notes: entry.notes ?? '',
+  };
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6">
@@ -70,95 +72,15 @@ export default async function EditEntryPage({
         </Link>
       </div>
 
-      {/* UPDATE FORM */}
-      <form
+      <EntryForm
         action={updateEntry}
-        className="space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 shadow"
-      >
-        <input type="hidden" name="id" value={entry.id} />
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <Label htmlFor="played_on">Date</Label>
-            <Input
-              id="played_on"
-              name="played_on"
-              type="date"
-              defaultValue={playedOn}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="duration_min">Minutes</Label>
-            <Input
-              id="duration_min"
-              name="duration_min"
-              type="number"
-              min={0}
-              defaultValue={duration}
-            />
-          </div>
-        </div>
-
-        <div>
-          <Label htmlFor="piece">Piece / Focus</Label>
-          <Input
-            id="piece"
-            name="piece"
-            defaultValue={piece}
-            placeholder="e.g., ii–V–I drills"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <Label htmlFor="bpm">BPM (optional)</Label>
-            <Input
-              id="bpm"
-              name="bpm"
-              type="number"
-              min={1}
-              max={400}
-              defaultValue={bpm as any}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="rating">Rating (1–5)</Label>
-            <Input
-              id="rating"
-              name="rating"
-              type="number"
-              min={1}
-              max={5}
-              defaultValue={rating}
-            />
-          </div>
-        </div>
-
-        <div>
-          <Label htmlFor="tags">Tags (comma separated)</Label>
-          <Input
-            id="tags"
-            name="tags"
-            defaultValue={tagsComma}
-            placeholder="scales, arpeggios"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="notes">Notes</Label>
-          <Textarea id="notes" name="notes" rows={5} defaultValue={notes} />
-        </div>
-
-        <div className="flex flex-wrap gap-3">
-          <Button type="submit">Save Changes</Button>
-        </div>
-      </form>
+        defaultValues={defaults}
+        submitLabel="Save Changes"
+      />
       {/* DELETE FORM lives here to keep dashboard simple for now */}
-      <form action={deleteEntry}>
+      <form id="delete-entry-form" action={deleteEntry} className="mt-3">
         <input type="hidden" name="id" value={entry.id} />
-        <DeleteConfirmButton />
+        <DeleteEntryButton formId="delete-entry-form" />
       </form>
     </div>
   );

@@ -35,7 +35,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         // default to submit when inside forms; otherwise leave as passed
         type={type ?? 'submit'}
         className={cn(
-          'inline-flex items-center justify-center rounded-lg font-medium outline-none transition',
+          'inline-flex items-center justify-center rounded-lg font-medium outline-none transition cursor-pointer',
           sizes[size],
           variants[variant],
           fullWidth && 'w-full',
