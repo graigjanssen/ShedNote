@@ -7,11 +7,11 @@ export default function LoginPage() {
   const [state, formAction] = useActionState(signInAction, null);
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Sign in</h1>
+    <div className="flex flex-col items-center mx-auto mt-16 max-w-lg rounded border border-zinc-500 p-6 space-y-6">
+      <h1 className="text-3xl font-semibold">Sign in</h1>
       <form
         action={formAction}
-        className="space-y-4"
+        className="mx-auto w-2/3 space-y-4"
         noValidate
         aria-describedby="login-help"
       >
@@ -28,9 +28,9 @@ export default function LoginPage() {
             {state.error}
           </p>
         )}
-        <Button>Sign in</Button>
+        <Button className="w-full mt-4">Sign in</Button>
       </form>
-      <p id="login-help" className="text-sm text-neutral-400">
+      <p id="login-help" className="text-md text-neutral-400">
         No account?{' '}
         <a href="/signup" className="underline">
           Sign up

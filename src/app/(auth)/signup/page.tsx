@@ -7,9 +7,9 @@ export default function SignupPage() {
   const [state, formAction] = useActionState(signUpAction, null);
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Create Account</h1>
-      <form action={formAction} className="space-y-4" noValidate>
+    <div className="flex flex-col items-center mx-auto mt-16 max-w-lg rounded border border-zinc-500 p-6 space-y-6">
+      <h1 className="text-3xl font-semibold">Create Account</h1>
+      <form action={formAction} className="mx-auto w-2/3 space-y-4" noValidate>
         <div>
           <Label htmlFor="email">Email</Label>
           <Input id="email" type="email" name="email" required />
@@ -23,9 +23,9 @@ export default function SignupPage() {
             {state.error}
           </p>
         )}
-        <Button>Sign Up</Button>
+        <Button className="w-full mt-4">Sign Up</Button>
       </form>
-      <p className="text-sm text-neutral-400">
+      <p className="text-md text-neutral-400">
         Have an account?{' '}
         <a href="/login" className="underline">
           Sign in
