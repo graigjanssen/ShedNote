@@ -26,7 +26,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       ghost:
         'bg-neutral-800 text-neutral-100 hover:bg-neutral-700 focus:ring-2 focus:ring-neutral-500',
       danger:
-        'bg-red-600 text-white hover:bg-red-500 focus:ring-2 focus:ring-red-400',
+        'bg-red-700 text-white hover:bg-red-600 focus:ring-2 focus:ring-red-500',
     };
 
     return (

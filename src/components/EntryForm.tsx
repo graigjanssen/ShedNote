@@ -12,15 +12,24 @@ import { toast } from 'sonner';
 type FormInput = z.input<typeof entryCreateSchema>;
 type FormOutput = z.output<typeof entryCreateSchema>;
 
+type EntryFormProps = {
+  action: (formData: FormData) => Promise<void>;
+  defaultValues: FormInput;
+  submitLabel?: string;
+  /**
+   * Optional secondary action node (e.g., Delete button/form).
+   * When provided, the footer becomes a two-button layout:
+   * [secondary on the left]  [primary on the right].
+   */
+  secondaryAction?: React.ReactNode;
+};
+
 export default function EntryForm({
   action,
   defaultValues,
   submitLabel = 'Save',
-}: {
-  action: (formData: FormData) => Promise<void>;
-  defaultValues: FormInput;
-  submitLabel?: string;
-}) {
+  secondaryAction,
+}: EntryFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
 
   const {
@@ -138,16 +147,39 @@ export default function EntryForm({
         <Textarea id="notes" rows={4} {...register('notes')} />
       </div>
 
-      <Button
-        type="button"
-        disabled={isSubmitting}
-        onClick={handleSubmit(onValid, () =>
-          toast.error('Please fix the highlighted errors.')
-        )}
-        className="w-full"
-      >
-        {isSubmitting ? 'Saving…' : submitLabel}
-      </Button>
+      {/* Footer buttons */}
+      {secondaryAction ? (
+        // EDIT MODE: two-button layout
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-around">
+          <div className="sm:w-1/3 flex justify-center">{secondaryAction}</div>
+          <div className="sm:w-1/3 flex justify-center">
+            <Button
+              type="button"
+              disabled={isSubmitting}
+              onClick={handleSubmit(onValid, () =>
+                toast.error('Please fix the highlighted errors.')
+              )}
+              className="w-full max-w-xs"
+            >
+              {isSubmitting ? 'Saving…' : submitLabel}
+            </Button>
+          </div>
+        </div>
+      ) : (
+        // CREATE MODE: single, wide, centered button (not full-width)
+        <div className="mt-6 flex justify-center">
+          <Button
+            type="button"
+            disabled={isSubmitting}
+            onClick={handleSubmit(onValid, () =>
+              toast.error('Please fix the highlighted errors.')
+            )}
+            className="w-full max-w-md"
+          >
+            {isSubmitting ? 'Saving…' : submitLabel}
+          </Button>
+        </div>
+      )}
     </form>
   );
 }

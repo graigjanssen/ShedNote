@@ -53,7 +53,7 @@ export async function updateEntry(formData: FormData) {
 
   // Revalidate the user-scoped dashboard tag (matches your server client tagging)
   revalidateTag(`entries${uid}`);
-  redirect('/dashboard');
+  redirect('/');
 }
 
 /**
@@ -75,5 +75,5 @@ export async function deleteEntry(formData: FormData) {
   if (error) throw new Error(error.message);
 
   revalidateTag(`entries:${uid}`);
-  redirect('/dashboard');
+  redirect('/');
 }

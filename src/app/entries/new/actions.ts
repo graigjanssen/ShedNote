@@ -37,5 +37,5 @@ export async function createEntry(formData: FormData) {
     throw new Error(insertErr.message);
   }
   revalidateTag(`entries:${uid}`);
-  redirect('/dashboard');
+  redirect('/');
 }

@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import AppHeader from '@/components/AppHeader';
 import EntryForm from '@/components/EntryForm';
 import DeleteEntryButton from '@/components/DeleteEntryButton';
-import { Button, Input, Label, Textarea } from '@/components/ui';
 import { updateEntry, deleteEntry } from './actions';
 
 type PracticeEntry = {
@@ -27,61 +27,76 @@ type PracticeEntry = {
  */
 export default async function EditEntryPage({
   params,
-  searchParams,
 }: {
-  params: Promise<{ id: string }>;
-  searchParams: Record<string, string | string[] | undefined>;
+  params: { id: string };
 }) {
-  const { id } = await params;
-  const supabase = await createClient(); // read-only, tag-aware
-  const { data: userData, error: userErr } = await supabase.auth.getUser();
-  if (userErr || !userData?.user) notFound();
-  const uid = userData.user.id;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  // Scope the fetch to the current user for safety (RLS also protects)
+  if (!user) {
+    return notFound();
+  }
+
   const { data: entry, error } = await supabase
     .from('practice_entries')
-    .select(
-      'id, user_id, played_on, duration_min, piece, bpm, tags, rating, notes'
-    )
-    .eq('id', id)
-    .eq('user_id', uid)
-    .single<PracticeEntry>();
+    .select('*')
+    .eq('id', params.id)
+    .eq('user_id', user.id)
+    .maybeSingle();
 
-  if (error || !entry) notFound();
+  if (error || !entry) {
+    return notFound();
+  }
 
   const defaults = {
-    played_on: (entry.played_on ?? '').slice(0, 10),
-    duration_min: String(entry.duration_min ?? ''),
+    played_on: entry.played_on ?? '',
+    duration_min: entry.duration_min?.toString() ?? '',
     piece: entry.piece ?? '',
-    bpm: entry.bpm == null ? '' : String(entry.bpm),
+    bpm: entry.bpm?.toString() ?? '',
     tags: Array.isArray(entry.tags) ? entry.tags.join(', ') : '',
-    rating: entry.rating == null ? '3' : String(entry.rating),
+    rating: (entry.rating ?? 3).toString(),
     notes: entry.notes ?? '',
   };
 
-  return (
-    <div className="mx-auto max-w-2xl px-4 py-6">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-white">Edit Entry</h1>
-        <Link
-          href="/dashboard"
-          className="text-sm text-zinc-300 underline underline-offset-4 hover:text-white"
-        >
-          Back to Dashboard
-        </Link>
-      </div>
+  const deleteFormId = `delete-entry-${entry.id}`;
 
-      <EntryForm
-        action={updateEntry}
-        defaultValues={defaults}
-        submitLabel="Save Changes"
-      />
-      {/* DELETE FORM lives here to keep dashboard simple for now */}
-      <form id="delete-entry-form" action={deleteEntry} className="mt-3">
-        <input type="hidden" name="id" value={entry.id} />
-        <DeleteEntryButton formId="delete-entry-form" />
-      </form>
+  return (
+    <div className="min-h-screen bg-zinc-950 text-zinc-50">
+      <AppHeader />
+      <main className="mx-auto max-w-2xl px-4 py-6">
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="text-xl font-semibold text-white">Edit Entry</h1>
+          <Link
+            href="/"
+            className="text-sm text-zinc-300 underline underline-offset-4 hover:text-white"
+          >
+            Back to Dashboard
+          </Link>
+        </div>
+
+        <EntryForm
+          action={updateEntry}
+          defaultValues={defaults}
+          submitLabel="Save Changes"
+          secondaryAction={
+            <form
+              id={deleteFormId}
+              action={deleteEntry}
+              className="w-full max-w-xs"
+            >
+              <input type="hidden" name="id" value={entry.id} />
+              <DeleteEntryButton
+                formId={deleteFormId}
+                size="sm"
+                ariaLabel="Delete entry"
+                className="w-full"
+              />
+            </form>
+          }
+        />
+      </main>
     </div>
   );
 }
